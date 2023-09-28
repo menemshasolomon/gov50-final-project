@@ -1,6 +1,6 @@
 ---
 title: "Gov 50 Final Project"
-author: "Your Name Here"
+author: "Mena Solomon"
 description: "My final project"
 output:
   distill::distill_article:
@@ -11,4 +11,18 @@ output:
 
 ## Project thoughts
 
-I am interested in exploring data related to...
+I am interested in exploring data related to:
+
+Correlation between anti-trans legislation and lack of support for lgbtq+ marriage
+
+Voter registration type and number of people who show up to vote
+- https://projects.fivethirtyeight.com/non-voters-poll-2020-election
+- https://www.pewresearch.org/politics/2021/04/22/republicans-and-democrats-move-further-apart-in-views-of-voting-access/
+
+Most popular music artists/genre and trump popularity
+
+Gun control 
+- https://projects.fivethirtyeight.com/guns-parkland-polling-quiz/
+
+Digital platforms and gender identity
+- https://www.pewresearch.org/social-trends/dataset/american-trends-panel-wave-109/
