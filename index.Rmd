@@ -26,3 +26,5 @@ Gun control
 
 Digital platforms and gender identity
 - https://www.pewresearch.org/social-trends/dataset/american-trends-panel-wave-109/
+
+Given the available data, I am leaning towards exploring attitudes to different forms of voter registration based on political party affiliation. 
