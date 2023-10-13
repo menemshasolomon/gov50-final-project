@@ -11,20 +11,16 @@ output:
 
 ## Project thoughts
 
-I am interested in exploring data related to:
+Why do certain individuals believe in automatic voter registration and to what extent is an individual’s perspective on automatic registration affected by their political party? In this study I plan to analyze data on the relationship between political party, race, and belief about automatic voter registration, while simultaneously comparing these conclusions to the results found on polls regarding voter ID laws. I believe that comparing these policies will be interesting as automatic registration is a somewhat new concept in America, whereas voter ID laws are historically controversial and skew on party lines. I hypothesize that views about automatic voter registration will correlate strongly with political party, much like support for voter ID laws. Furthermore, I expect that racially marginalized groups (who are typically excluded by our current system of voter registration) will tend to favor both of these measures above white voters. To analyze this data I will first break down support for automatic registration (VTPRIORITY_a_W87 where 1 = Strongly favor and 4 = Strongly oppose) and then group that data based on the explanatory variables — political party affiliation (F_PARTY_FINAL 	1 = Republican, 2 = Democrat, 3= Independent, 4 = Something else)  and race (F_RACETHNMOD 1 = White, non-Hispanic,  2 = Black, non-Hispanic , 3 = Hispanic, 4 = Other, 5 = Asian, non-Hispanic, 99 = Refused). I will then apply the same methodology to to the data on the other response variable, voter id laws (VTPRIORITY_j_W87 where  1 = Strongly favor and 4 = Strongly oppose). By identifying the correlation between opinion on the legislation and both race and political party, I will be able to understand how opinions on automatic voter registration differ in the United States and the mechanisms by which people arrive at those conclusions. If views on automatic registration group based on race and party affiliation (like they do for voter ID laws), it will prove my hypothesis that marginalized groups often left out of the voting process support automatic registration as another mechanism by which voting access can be expanded. If the data indicates no correlation between the explanatory variables and opinion on automatic registration (or less of a correlation than is present for voter id laws), it will prove that automatic registration is viewed as intrinsically different than other policies which seek to expand voting access.
 
-Correlation between anti-trans legislation and lack of support for lgbtq+ marriage
+```{r}
+library(tidyverse)
+library(haven)
+data <-  read_sav("data/ATP W87.sav")
 
-Voter registration type and number of people who show up to vote
-- https://projects.fivethirtyeight.com/non-voters-poll-2020-election
-- https://www.pewresearch.org/politics/2021/04/22/republicans-and-democrats-move-further-apart-in-views-of-voting-access/
+data |>
+  select(QKEY, F_AGECAT, F_GENDER, F_RACETHNMOD, F_PARTY_FINAL, VTPRIORITY_a_W87, VTPRIORITY_j_W87) |>
+  head( n= 6)
 
-Most popular music artists/genre and trump popularity
+```
 
-Gun control 
-- https://projects.fivethirtyeight.com/guns-parkland-polling-quiz/
-
-Digital platforms and gender identity
-- https://www.pewresearch.org/social-trends/dataset/american-trends-panel-wave-109/
-
-Given the available data, I am leaning towards exploring attitudes to different forms of voter registration based on political party affiliation. 
