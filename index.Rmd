@@ -40,7 +40,7 @@ voterid_plot_party <- data |>
   group_by(party) |>
   ggplot(aes(x = factor(voteridlaws), fill = factor(partylabel))) +
   geom_bar(position = "dodge") +
-  labs(x = "Opinion on Voter ID Laws", y = "Number of Respondents")
+  labs(x = "Opinion on Voter ID Laws", y = "Number of Respondents", title = "How Party Membership Affects Respondents Views on Voter ID Laws")
 
 voterid_plot_party
 ```
@@ -57,7 +57,7 @@ automatic_registration_plot_party <- data |>
   group_by(party) |>
   ggplot(aes(x = factor(automaticregistration), fill = factor(partylabel))) +
   geom_bar(position = "dodge") +
-  labs(x = "Opinion on Automatic Registration", y = "Number of Respondents")
+  labs(x = "Opinion on Automatic Registration", y = "Number of Respondents", title = "How Party Membership Affects Respondents Views on Automatic Registration")
 
 automatic_registration_plot_party
 ```
