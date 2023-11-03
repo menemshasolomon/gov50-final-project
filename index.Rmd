@@ -22,25 +22,70 @@ data <- data |>
   select(QKEY, F_AGECAT, F_GENDER, F_RACETHNMOD, F_PARTY_FINAL, VTPRIORITY_a_W87, VTPRIORITY_j_W87)|>
   rename(automaticregistration = VTPRIORITY_a_W87,
          voteridlaws = VTPRIORITY_j_W87,
-         party = F_PARTY_FINAL) 
+         party = F_PARTY_FINAL,
+         race = F_RACETHNMOD) 
 
 
 ```
 
-```{r}
-automatic_registration_plot <- data |>
-  filter(automaticregistration!=99)  |>
-  ggplot(mapping = aes(x = automaticregistration)) +
-  geom_bar() 
-automatic_registration_plot
-```
 
 ```{r}
-automatic_registration_party <- data |>
-  filter(party!=4, party!=99, automaticregistration!=99) |>
+voterid_plot_party <- data |>
+  filter(party != 4, party != 99, voteridlaws != 99) |>
+  mutate(partylabel = case_when(
+    party == 1 ~ "Republican",
+    party == 2 ~ "Democrat",
+     party == 3 ~ "Independent"
+  )) |>
   group_by(party) |>
-  ggplot(mapping = aes(x = automaticregistration)) +
-  geom_bar() 
-automatic_registration_party 
+  ggplot(aes(x = factor(voteridlaws), fill = factor(partylabel))) +
+  geom_bar(position = "dodge") 
 
+voterid_plot_party
+```
+1 = support voter ids
+
+```{r}
+automatic_registration_plot_party <- data |>
+  filter(party != 4, party != 99, automaticregistration != 99) |>
+  mutate(partylabel = case_when(
+    party == 1 ~ "Republican",
+    party == 2 ~ "Democrat",
+     party == 3 ~ "Independent"
+  )) |>
+  group_by(party) |>
+  ggplot(aes(x = factor(automaticregistration), fill = factor(partylabel))) +
+  geom_bar(position = "dodge") 
+
+automatic_registration_plot_party
+```
+1 = support automatic registration
+```{r}
+automatic_registration_avg_party <- data |>
+  filter(party != 4, party != 99, automaticregistration != 99) |>
+  mutate(partylabel = case_when(
+    party == 1 ~ "Republican",
+    party == 2 ~ "Democrat",
+    party == 3 ~ "Independent")) |>
+  group_by(partylabel) |>
+  summarize(meanreg = mean(automaticregistration)) |>
+  ggplot(aes(x = partylabel, y = meanreg)) +
+  geom_col()
+
+automatic_registration_avg_party
+```
+```{r}
+voterid_avg_party <- data |>
+  filter(party != 4, party != 99, voteridlaws != 99) |>
+  mutate(partylabel = case_when(
+    party == 1 ~ "Republican",
+    party == 2 ~ "Democrat",
+    party == 3 ~ "Independent")) |>
+  group_by(partylabel) |>
+  summarize(meanreg = mean(voteridlaws)) |>
+  ggplot(aes(x = partylabel, y = meanreg)) +
+  geom_col()
+
+voterid_avg_party
+```
 
