@@ -39,7 +39,8 @@ voterid_plot_party <- data |>
   )) |>
   group_by(party) |>
   ggplot(aes(x = factor(voteridlaws), fill = factor(partylabel))) +
-  geom_bar(position = "dodge") 
+  geom_bar(position = "dodge") +
+  labs(x = "Opinion on Voter ID Laws", y = "Number of Respondents")
 
 voterid_plot_party
 ```
@@ -55,7 +56,8 @@ automatic_registration_plot_party <- data |>
   )) |>
   group_by(party) |>
   ggplot(aes(x = factor(automaticregistration), fill = factor(partylabel))) +
-  geom_bar(position = "dodge") 
+  geom_bar(position = "dodge") +
+  labs(x = "Opinion on Automatic Registration", y = "Number of Respondents")
 
 automatic_registration_plot_party
 ```
@@ -70,7 +72,7 @@ automatic_registration_avg_party <- data |>
   group_by(partylabel) |>
   summarize(meanreg = mean(automaticregistration)) |>
   ggplot(aes(x = partylabel, y = meanreg)) +
-  geom_col()
+  geom_col(aes(fill = partylabel))
 
 automatic_registration_avg_party
 ```
@@ -84,7 +86,7 @@ voterid_avg_party <- data |>
   group_by(partylabel) |>
   summarize(meanreg = mean(voteridlaws)) |>
   ggplot(aes(x = partylabel, y = meanreg)) +
-  geom_col()
+  geom_col(aes(fill = partylabel))
 
 voterid_avg_party
 ```
