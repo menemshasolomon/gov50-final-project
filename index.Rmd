@@ -18,9 +18,29 @@ library(tidyverse)
 library(haven)
 data <-  read_sav("data/ATP W87.sav")
 
-data |>
-  select(QKEY, F_AGECAT, F_GENDER, F_RACETHNMOD, F_PARTY_FINAL, VTPRIORITY_a_W87, VTPRIORITY_j_W87) |>
-  head( n= 6)
+data <- data |>
+  select(QKEY, F_AGECAT, F_GENDER, F_RACETHNMOD, F_PARTY_FINAL, VTPRIORITY_a_W87, VTPRIORITY_j_W87)|>
+  rename(automaticregistration = VTPRIORITY_a_W87,
+         voteridlaws = VTPRIORITY_j_W87,
+         party = F_PARTY_FINAL) 
+
 
 ```
+
+```{r}
+automatic_registration_plot <- data |>
+  filter(automaticregistration!=99)  |>
+  ggplot(mapping = aes(x = automaticregistration)) +
+  geom_bar() 
+automatic_registration_plot
+```
+
+```{r}
+automatic_registration_party <- data |>
+  filter(party!=4, party!=99, automaticregistration!=99) |>
+  group_by(party) |>
+  ggplot(mapping = aes(x = automaticregistration)) +
+  geom_bar() 
+automatic_registration_party 
+
 
