@@ -86,6 +86,31 @@ knitr::kable(party_cor,
 From the Data Visualization as well as the numerical values displayed above, it becomes clear that the party membership of a respondent correlates with their views on both voter ID laws and automatic registration. Membership with the Democratic Party correlates with negative attitudes towards voter ID laws by a coefficient of 0.45. For automatic registration, however, membership with the Democratic Party correlates with more positive views of the policy, by a coefficient of -0.54.
 
 ```{r}
+voterid_plot_race <- data |>
+  group_by(race) |>
+  ggplot(aes(x = factor(voteridlabel), fill = factor(racelabel))) +
+  geom_bar(position = "dodge") +
+  labs(x = "Opinion on Voter ID Laws", 
+       y = "Number of Respondents", 
+       title = "How Race Affects Respondents Views on Voter ID Laws",
+       fill = "Race")
+
+voterid_plot_race
+
+automatic_registration_plot_race <- data |>
+  group_by(race) |>
+  ggplot(aes(x = factor(automaticreglabel), fill = factor(racelabel))) +
+  geom_bar(position = "dodge") +
+  labs(x = "Opinion on Automatic Registration", 
+       y = "Number of Respondents", 
+       title = "How Race Affects Respondents Views on Automatic Registration",
+       fill = "Race")
+
+automatic_registration_plot_race
+```
+
+
+```{r}
 automaticreg_race_boots <- data |>
   rep_slice_sample(prop = 1, reps = 1000, replace = TRUE) |>
   group_by(replicate, racelabel) |>
@@ -103,7 +128,7 @@ automaticreg_race_boots |>
   geom_histogram(aes(y = after_stat(density)), binwidth = 0.01) +
   geom_vline(xintercept = unlist(ate_ci_95), color = "red") +
   labs(x = "Average Treatment Effect", 
-       y = "Count", 
+       y = "Density", 
        title = "1,000 Bootstrap Replications of the Estimated Average Treatment Effect",
        subtitle = "How Race Effects Views on Automatic Registration")
 
@@ -124,13 +149,32 @@ voteridlaws_race_boots |>
   geom_histogram(aes(y = after_stat(density)), binwidth = 0.01) +
   geom_vline(xintercept = unlist(ate_ci_95), color = "red") +
   labs(x = "Average Treatment Effect", 
-       y = "Count", 
+       y = "Density", 
        title = "1,000 Bootstrap Replications of the Estimated Average Treatment Effect",
        subtitle = "How Race Effects Views on Voter ID Laws")
 ```
 In this experiment a respondent's views on both voter ID laws and automatic registration are compared on the basis of racial group. The average treatment effect here displays the difference in views on both policies for those who identify as white and those who identify as black. In an attempt to limit the interference of outside variables, bootstrap replications were used here, generating 1000 random sample groups. The bootstrap replications display the number of samples which result in a particular average treatment effect. For the graph of views on automatic registration, the average treatment effect follows a normal distribution with the center located around -0.6, meaning on average black respondents were more in favor of automatic registration than white respondents by about 0.6 points. Similarly, the ATE for voter id laws also follows a normal distribution; however, the center is located around 0.3, thus on average black respondents were less in favor of voter id laws than white respondents by about 0.3 points.
 
-For both of these bootstrap samples, the 95% confidence interval does not include zero. Thus, at least at the 95% confidence interval, it is possible to discount the idea that race bears no  effect on a respondent's views on both automatic registration and voter id laws.
+For both of these bootstrap samples, the 95% confidence interval does not include zero. Thus, at least at the 95% confidence interval, it is possible to discount the idea that race bears no effect on a respondent's views on both automatic registration and voter id laws.
+
+```{r}
+library(infer)
+library(modelsummary)
+fit_ate_party <- lm(voteridlaws ~ race + party + F_GENDER + F_AGECAT, data = data)
+
+modelsummary::modelsummary(fit_ate_party,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))  
+
+fit_ate_party <- lm(automaticregistration ~ race + party + F_GENDER + F_AGECAT, data = data)
+
+modelsummary::modelsummary(fit_ate_party,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))  
+```
+
 
 ```{r}
 voterid_diff <- data |>
