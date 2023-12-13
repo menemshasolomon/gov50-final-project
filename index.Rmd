@@ -25,7 +25,6 @@ Furthermore, this report also measures the influence of other explanatory variab
 
 For all of the variables states above, the option of non-response was filtered out. For most of the variables, non-response was represented by a result of 99. For party and race, however, an answer of four represented an answer of other, which, for the sake of this analysis, was removed. Furthermore, the answer of Independent for party affiliation was removed for the sake of simplicity. These alterations filtered the data from 5,109 responses to 2,902 responses, it is those individuals whose data is analyzed below.
 
-
 ```{r}
 library(tidyverse)
 library(haven)
@@ -67,6 +66,44 @@ data <- data |>
 
 
 ```
+
+#Data Visualization
+
+The figure below illustrates the dependent variable: respondent's perspectives on automatic registration.
+
+```{r}
+autoregplot <- data |>
+  mutate(automaticregdetail = case_when(automaticregistration == 1 ~ "Strongly Supports",
+                                        automaticregistration == 2 ~ "Somewhat Supports",
+                                        automaticregistration == 3 ~ "Strongly Against",
+                                        automaticregistration == 4 ~ "Somewhat Against")) |>
+  group_by(automaticreglabel) |>
+  ggplot(mapping = aes(x = automaticreglabel, fill = factor(automaticregdetail))) +
+  geom_bar() +
+  labs(x = "Opinion on Automatic Registration", 
+       y = "Number of Respondents", 
+       title = "How do Respondents Feel About Automatic Registration",
+       fill = "Degree of Support")
+autoregplot
+```
+Furthermore, the next figure illustrates the independent variable: respondent's perspectives on voter ID laws.
+
+```{r}
+voteridplot <- data |>
+  mutate(voteriddetail = case_when(voteridlaws == 1 ~ "Strongly Supports",
+                                        voteridlaws == 2 ~ "Somewhat Supports",
+                                        voteridlaws == 3 ~ "Strongly Against",
+                                        voteridlaws == 4 ~ "Somewhat Against")) |>
+  group_by(voteridlabel) |>
+  ggplot(mapping = aes(x = voteridlabel, fill = factor(voteriddetail))) +
+  geom_bar() +
+  labs(x = "Opinion on Voter ID Laws", 
+       y = "Number of Respondents", 
+       title = "How do Respondents Feel About Voter ID Laws",
+       fill = "Degree of Support")
+voteridplot
+```
+
 
 ```{r}
 voterid_automaticreg_plot <- data |>
