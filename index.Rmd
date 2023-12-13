@@ -25,7 +25,7 @@ Since the American Trends Panel contains data on a multitude of issues, it was i
 
 Furthermore, this report also measures the influence of other explanatory variables such as race, age, gender, and political party, with a specific focus on race and political party. These variables were all imported into the original data under the names F_AGECAT, F_GENDER, F_RACETHNMOD, and F_PARTY_FINAL and renamed as age, gender, race, and party respectively. In the data set, age is broken up into four categories 18-29, 30-49, 50-64, and 65+. Gender was measured as 1 = respondent identifies as a man, 2 = respondent identifies as a women, 3 = respondent identifies in some other way. Race is broken up into five categories where 1 = White, non-Hispanic, 2 = Black, non-Hispanic, 3 = Hispanic, 4 = other, and 5 = Asian, non-Hispanic. Finally, party was broken down into 1 = Republican, 2 = Democrat, 3 = Independent, and 4 = Something else
 
-For all of the variables states above, the option of non-response was filtered out. For most of the variables, non-response was represented by a result of 99. For party and race, however, an answer of four represented an answer of other, which, for the sake of this analysis, was removed. Furthermore, the answer of Independent for party affiliation was removed for the sake of simplicity. These alterations filtered the data from 5,109 responses to 2,902 responses, it is those individuals whose data is analyzed below.
+For all of the variables stated above, the option of non-response was filtered out. For most of the variables, non-response was represented by a result of 99. For party and race, however, an answer of four represented an answer of other, which, for the sake of this analysis, was removed. Furthermore, the answer of Independent for party affiliation was removed for the sake of simplicity. These alterations filtered the data from 5,109 responses to 2,902 responses, it is those individuals whose data is analyzed below.
 
 ```{r}
 library(tidyverse)
@@ -75,6 +75,11 @@ Data Visualizations
 The figure below illustrates the dependent variable: respondent's perspectives on automatic registration.
 
 ```{r}
+my_colors <- c("Strongly Supports" = "cadetblue1", 
+               "Somewhat Supports" = "cadetblue3", 
+               "Strongly Against" = "indianred1", 
+               "Somewhat Against" = "indianred3")
+
 autoregplot <- data |>
   mutate(automaticregdetail = case_when(automaticregistration == 1 ~ "Strongly Supports",
                                         automaticregistration == 2 ~ "Somewhat Supports",
@@ -83,6 +88,7 @@ autoregplot <- data |>
   group_by(automaticreglabel) |>
   ggplot(mapping = aes(x = automaticreglabel, fill = factor(automaticregdetail))) +
   geom_bar() +
+  scale_fill_manual(values = my_colors) +
   labs(x = "Opinion on Automatic Registration", 
        y = "Number of Respondents", 
        title = "How do Respondents Feel About Automatic Registration",
@@ -102,6 +108,7 @@ voteridplot <- data |>
   group_by(voteridlabel) |>
   ggplot(mapping = aes(x = voteridlabel, fill = factor(voteriddetail))) +
   geom_bar() +
+  scale_fill_manual(values = my_colors) +
   labs(x = "Opinion on Voter ID Laws", 
        y = "Number of Respondents", 
        title = "How do Respondents Feel About Voter ID Laws",
@@ -113,31 +120,67 @@ Similar to automatic registration, there appears to be more support for voter id
 Results
 ---
 
+Bootstrapped Difference in Means Calculation
+---
+
+To understand the how a respondent's perspective on voter ID laws relates to their perspective on automatic registration, I performed a difference in means calculation wherein the average feeling toward automatic registration was taken for both the group who supports voter id laws and those who don't, then subtracted from each other. In an attempt to limit the interference of outside variables, bootstrap replications were used here, generating 1,000 random sample groups. 
+
+
 ```{r}
-voterid_automaticreg_plot <- data |>
-  group_by(voteridlabel) |>
-  ggplot(mapping = aes(x = factor(automaticreglabel), fill = factor(voteridlabel))) +
-  geom_bar(position = "dodge") +
-  labs(x = "Opinion on Automatic Registration", 
-       y = "Number of Respondents", 
-       title = "How Perspective on Voter ID Laws Affects Respondents Views on Automatic Registration",
-       fill = "Perspective on Voter ID Laws")
-voterid_automaticreg_plot
+ate_boots <- data |>
+  rep_slice_sample(prop = 1, reps = 1000, replace = TRUE) |>
+  group_by(replicate, voteridlabel) |>
+  summarize(automaticregistrationmean = mean(automaticregistration)) |>
+  pivot_wider(names_from = voteridlabel, values_from = automaticregistrationmean) |>
+  mutate(ATE = `Supports Voter ID Laws` - `Against Voter ID Laws`)
+
+ate_ci_95 <- ate_boots |>
+select(replicate, ATE) |>
+get_confidence_interval(level = 0.95, type = "percentile")
+
+ate_boots |>
+  ggplot(mapping = aes(x = ATE))+
+  geom_histogram(aes(y = after_stat(density)), binwidth = 0.01) +
+  geom_vline(xintercept = unlist(ate_ci_95), color = "red") +
+  labs(x = "Difference in Means", 
+       y = "Density", 
+       subtitle = "1,000 Bootstrap Replications of the Estimated Affect of Supporting Voter ID Laws on Feelings Toward Automatic Registration",
+       title = "How Perspective on Voter ID Laws Affects Views on Automatic Registration")
+
 ```
+The bootstrap replications display the number of samples which result in a particular difference in means. For the graph of views on automatic registration, the average treatment effect follows a normal distribution with the center located around 0.57, meaning on average respondents who support voter ID laws were less in favor of automatic registration than those who did not by about 0.57 points. Furthermore, the 95% confidence interval calculated above has a lower bound of 0.486 and an upper bound of 0.638, thus it does not include zero. Thus, at least at the 95% confidence interval, it is possible to discount the null hypothesis — support for voter ID laws bears no effect on a respondent's views on automatic registration.
 
+Multiple Regression
+---
+
+To further explore this relationship, I conducted a regression which not only analyzed the impact of my primary independent variable but also my other independent variables. This regression analyzes the effect of respondents' perspective on voter ID laws, race, party, gender, and age on their views about automatic registration.
 
 ```{r}
-voterid_plot_party <- data |>
-  group_by(party) |>
-  ggplot(aes(x = factor(voteridlabel), fill = factor(partylabel))) +
-  geom_bar(position = "dodge") +
-  labs(x = "Opinion on Voter ID Laws", 
-       y = "Number of Respondents", 
-       title = "How Party Membership Affects Respondents Views on Voter ID Laws",
-       fill = "Party")
+library(infer)
+library(modelsummary)
+data2 <- data |>
+  filter(race != 3,
+         race != 5) |>
+  mutate(voteridbinary = if_else(voteridlaws < 2, 1, 0))
 
-voterid_plot_party
+fit_ate_voterid <- 
+  lm(automaticregistration ~ voteridbinary + race + party + gender + age, data = data2)
 
+modelsummary::modelsummary(fit_ate_voterid,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))  
+```
+This regression indicates that relative to those who oppose voter ID laws, an individual who supports voter ID laws scores 0.148 points higher on their feeling towards automatic registration: meaning they oppose the policy by 0.148 points more than their peers who do not support voter ID laws. The p-value of 0.005 indicates that this result is highly significant. Furthermore, this information indicates that we can not only reject the null hypothesis of no effect at the 0.05 level but at the 0.01 level as well, as 0.005 is less than 0.01.
+
+The regression above also analyzes the effect of other independent, and possibly explanatory, variables. To evaluate if the effect of these other variables is statistically significant, it is important to first look at their p-values. Only age and party have a p-value under 0.05, the value which indicates statistical significance. This data indicates that neither race nor gender have a significant impact on a respondent's view toward automatic registration.
+
+In examining age and party more closely, the coefficient for age is found to be 0.066, indicating that as an individual's age increases, they tend to oppose automatic registration by 0.066 more points, relative to younger respondents. The p-value of 0.004 indicates that the coefficient found in the regression is highly significant. Furthermore, the coefficient for party is -1.419, indicating that Democrats tend to favor automatic registration by 1.419 points more than republicans. With a p-value less than 0.001, this result appears to be highly statistically significant. Indeed, the coefficient for party as well as its corresponding p-value indicate that it is party, not age or perspective on voter ID laws, which serves as the largest determinant of a respondent's perspective on automatic registration.
+
+Summary Graph 
+---
+
+```{r}
 automatic_registration_plot_party <- data |>
   group_by(party) |>
   ggplot(aes(x = factor(automaticreglabel), fill = factor(partylabel))) +
@@ -149,77 +192,5 @@ automatic_registration_plot_party <- data |>
 
 automatic_registration_plot_party
 ```
-From the Data Visualization as well as the numerical values displayed above, it becomes clear that the party membership of a respondent correlates with their views on both voter ID laws and automatic registration. Membership with the Democratic Party correlates with negative attitudes towards voter ID laws by a coefficient of 0.45. For automatic registration, however, membership with the Democratic Party correlates with more positive views of the policy, by a coefficient of -0.54.
-
-```{r}
-voterid_plot_race <- data |>
-  group_by(race) |>
-  ggplot(aes(x = factor(voteridlabel), fill = factor(racelabel))) +
-  geom_bar(position = "dodge") +
-  labs(x = "Opinion on Voter ID Laws", 
-       y = "Number of Respondents", 
-       title = "How Race Affects Respondents Views on Voter ID Laws",
-       fill = "Race")
-
-voterid_plot_race
-
-automatic_registration_plot_race <- data |>
-  group_by(race) |>
-  ggplot(aes(x = factor(automaticreglabel), fill = factor(racelabel))) +
-  geom_bar(position = "dodge") +
-  labs(x = "Opinion on Automatic Registration", 
-       y = "Number of Respondents", 
-       title = "How Race Affects Respondents Views on Automatic Registration",
-       fill = "Race")
-
-automatic_registration_plot_race
-```
 
 
-```{r}
-set.seed(02138)
-
-ate_boots <- data |>
-  rep_slice_sample(prop = 1, reps = 1000, replace = TRUE) |>
-  group_by(replicate, voteridlabel) |>
-  summarize(automaticregistrationmean = mean(automaticregistration)) |>
-  pivot_wider(names_from = voteridlabel, values_from = automaticregistrationmean) |>
-  mutate(ATE = `Supports Voter ID Laws` - `Against Voter ID Laws`)
-ate_boots  
-
-ate_ci_90 <- ate_boots |>
-select(replicate, ATE) |>
-get_confidence_interval(level = 0.90, type = "percentile")
-ate_ci_90
-
-ate_boots |>
-  ggplot(mapping = aes(x = ATE))+
-  geom_histogram(aes(y = after_stat(density)), binwidth = 0.01) +
-  geom_vline(xintercept = unlist(ate_ci_90), color = "red") +
-  labs(x = "Average Treatment Effect", 
-       y = "Density", 
-       subtitle = "1,000 Bootstrap Replications of the Estimated Average Treatment Effect",
-       title = "How Perspective on Voter ID Laws Effects Views on Automatic Registration")
-
-```
-
-
-```{r}
-library(infer)
-library(modelsummary)
-fit_ate_voterid <- 
-  lm(automaticregistration ~ voteridlaws + race + party + gender + age, data = data)
-
-modelsummary::modelsummary(fit_ate_voterid,
-                           statistic = c("s.e. = {std.error}",
-                                         "p = {p.value}"),
-                           gof_map = c("nobs", "r.squared", "adj.r.squared"))  
-
-fit_ate_automaticreg <- 
-  lm(automaticregistration ~ race + party + gender + age, data = data)
-
-modelsummary::modelsummary(fit_ate_automaticreg,
-                           statistic = c("s.e. = {std.error}",
-                                         "p = {p.value}"),
-                           gof_map = c("nobs", "r.squared", "adj.r.squared"))  
-```
