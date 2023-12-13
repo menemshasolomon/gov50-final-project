@@ -1,7 +1,7 @@
 ---
-title: "Gov 50 Final Project"
+title: "Why do Individuals Support Automatic Registration?"
 author: "Mena Solomon"
-description: "My final project"
+description: "A report exploring the effect of support for progressive voting policy, like abolishing voter ID laws, on an individual's perspective on automatic registration."
 output:
   distill::distill_article:
     self_contained: false
@@ -9,9 +9,22 @@ output:
 
 
 
-## Project thoughts
+## Introduction
 
-Why do certain individuals believe in automatic voter registration and to what extent is an individual’s perspective on automatic registration affected by their political party? In this study I plan to analyze data on the relationship between political party, race, and belief about automatic voter registration, while simultaneously comparing these conclusions to the results found on polls regarding voter ID laws. I believe that comparing these policies will be interesting as automatic registration is a somewhat new concept in America, whereas voter ID laws are historically controversial and skew on party lines. I hypothesize that views about automatic voter registration will correlate strongly with political party, much like support for voter ID laws. Furthermore, I expect that racially marginalized groups (who are typically excluded by our current system of voter registration) will tend to favor both of these measures above white voters. To analyze this data I will first break down support for automatic registration (VTPRIORITY_a_W87 where 1 = Strongly favor and 4 = Strongly oppose) and then group that data based on the explanatory variables — political party affiliation (F_PARTY_FINAL 	1 = Republican, 2 = Democrat, 3= Independent, 4 = Something else)  and race (F_RACETHNMOD 1 = White, non-Hispanic,  2 = Black, non-Hispanic , 3 = Hispanic, 4 = Other, 5 = Asian, non-Hispanic, 99 = Refused). I will then apply the same methodology to to the data on the other response variable, voter id laws (VTPRIORITY_j_W87 where  1 = Strongly favor and 4 = Strongly oppose). By identifying the correlation between opinion on the legislation and both race and political party, I will be able to understand how opinions on automatic voter registration differ in the United States and the mechanisms by which people arrive at those conclusions. If views on automatic registration group based on race and party affiliation (like they do for voter ID laws), it will prove my hypothesis that marginalized groups often left out of the voting process support automatic registration as another mechanism by which voting access can be expanded. If the data indicates no correlation between the explanatory variables and opinion on automatic registration (or less of a correlation than is present for voter id laws), it will prove that automatic registration is viewed as intrinsically different than other policies which seek to expand voting access.
+With the 2024 general election rapidly approaching, issues of low voter turnout and mass disenfranchisement continue to plague the country. Policies which seek to reach the quarter of Americans who are not currently registered to vote continue to garner the attention of both politicians and the media. In particular, the policy of automatic registration, which would replace the opt-in system of voter registration with an opt-out system, has already been successfully implemented in over 20 states. Indeed, a report from the New Brennan Center found that "AVR markedly increases the number of voters being registered [with] increases in the number of registrants ranging from 9 to 94 percent." If automatic registration could be the key to increasing voter registration and thus turnout in the United States, why do some individuals still refuse to support this policy? This report seeks to understand why certain individuals support automatic voter registration and to what extent an individual’s perspective on automatic registration merely a product of their support of other progressive voting policies? 
+
+I hypothesize that perspective on automatic registration will correlate with perspective on voter ID laws wherein individuals who oppose voter ID laws, a policy with a longstanding history of voter discrimination, will support automatic registration, a policy which would increase access to voting. Furthermore, I expect this relationship to be in large part explained first by party membership, as democrats typically support progressive voting policies, and second by racial identity, as marginalized racial groups are historically the most affected by voter disenfranchisement.  
+
+##The Data
+
+The data for this report comes from the Pew Research Center's American Trends Panel, a survey which is sent to a random sampling of 10,000 American adults meant to represent the diversity of America. The Pew Center makes a conscious effort to minimize the effect of external variables on the data they collect, thus generating trends data that is representative of American opinion. This report analyzes data on respondent's opinions on various forms of voter registration — specifically voter ID laws and automatic registration — in the months after the 2020 general election. This data comes from Wave 87 of the American Trends Panel which was conducted in April 2021, three months after the Inauguration of President Biden, and consists of responses from half of the panelists (5,109 respondents).
+
+Since the American Trends Panel contains data on a multitude of issues, it was important to filter, rename, and refine the data to address the specific research question stated above. The independent variable addressed in this research is perspective on voter ID laws, reported in the variable VTPRIORITY_j_W87 where  1 = Strongly favor, 2 = Somewhat favor, 3 = Somewhat oppose, and 4 = Strongly oppose. In the analysis below, this variable was renamed to voteridlaws. Furthermore, to simplify this variable for the data visualization a new variable was created entitles voteridlabel in which those who responded with a one or two were grouped into a category of supporting voter ID laws and  those who responded with a 3 or 4 were grouped as being against voter ID laws. The dependent variable is perspective on automatic registration, reported in the variable VTPRIORITY_a_W87 which operates on the same scale as the voter ID law variable. This variable was similarly renamed to be automaticregistration, then further split into two categories of support and oppose under the variable automaticreglabel. 
+
+Furthermore, this report also measures the influence of other explanatory variables such as race, age, gender, and political party, with a specific focus on race and political party. These variables were all imported into the original data under the names F_AGECAT, F_GENDER, F_RACETHNMOD, and F_PARTY_FINAL and renamed as age, gender, race, and party respectively. In the data set, age is broken up into four categories 18-29, 30-49, 50-64, and 65+. Gender was measured as 1 = respondent identifies as a man, 2 = respondent identifies as a women, 3 = respondent identifies in some other way. Race is broken up into five categories where 1 = White, non-Hispanic, 2 = Black, non-Hispanic, 3 = Hispanic, 4 = other, and 5 = Asian, non-Hispanic. Finally, party was broken down into 1 = Republican, 2 = Democrat, 3 = Independent, and 4 = Something else
+
+For all of the variables states above, the option of non-response was filtered out. For most of the variables, non-response was represented by a result of 99. For party and race, however, an answer of four represented an answer of other, which, for the sake of this analysis, was removed. Furthermore, the answer of Independent for party affiliation was removed for the sake of simplicity. These alterations filtered the data from 5,109 responses to 2,902 responses, it is those individuals whose data is analyzed below.
+
 
 ```{r}
 library(tidyverse)
@@ -33,7 +46,9 @@ data <- data |>
          voteridlaws != 99,
          automaticregistration != 99,
          race != 4,
-         race != 99) |>
+         race != 99,
+         gender != 99,
+         age != 99)|>
   mutate(
     partylabel = case_when(
       party == 1 ~ "Republican",
