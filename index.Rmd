@@ -9,13 +9,15 @@ output:
 
 
 
-## Introduction
+Introduction
+----
 
 With the 2024 general election rapidly approaching, issues of low voter turnout and mass disenfranchisement continue to plague the country. Policies which seek to reach the quarter of Americans who are not currently registered to vote continue to garner the attention of both politicians and the media. In particular, the policy of automatic registration, which would replace the opt-in system of voter registration with an opt-out system, has already been successfully implemented in over 20 states. Indeed, a report from the New Brennan Center found that "AVR markedly increases the number of voters being registered [with] increases in the number of registrants ranging from 9 to 94 percent." If automatic registration could be the key to increasing voter registration and thus turnout in the United States, why do some individuals still refuse to support this policy? This report seeks to understand why certain individuals support automatic voter registration and to what extent an individual’s perspective on automatic registration merely a product of their support of other progressive voting policies? 
 
 I hypothesize that perspective on automatic registration will correlate with perspective on voter ID laws wherein individuals who oppose voter ID laws, a policy with a longstanding history of voter discrimination, will support automatic registration, a policy which would increase access to voting. Furthermore, I expect this relationship to be in large part explained first by party membership, as democrats typically support progressive voting policies, and second by racial identity, as marginalized racial groups are historically the most affected by voter disenfranchisement.  
 
-##The Data
+The Data
+----
 
 The data for this report comes from the Pew Research Center's American Trends Panel, a survey which is sent to a random sampling of 10,000 American adults meant to represent the diversity of America. The Pew Center makes a conscious effort to minimize the effect of external variables on the data they collect, thus generating trends data that is representative of American opinion. This report analyzes data on respondent's opinions on various forms of voter registration — specifically voter ID laws and automatic registration — in the months after the 2020 general election. This data comes from Wave 87 of the American Trends Panel which was conducted in April 2021, three months after the Inauguration of President Biden, and consists of responses from half of the panelists (5,109 respondents).
 
@@ -67,7 +69,8 @@ data <- data |>
 
 ```
 
-#Data Visualization
+Data Visualizations
+---
 
 The figure below illustrates the dependent variable: respondent's perspectives on automatic registration.
 
@@ -86,7 +89,9 @@ autoregplot <- data |>
        fill = "Degree of Support")
 autoregplot
 ```
-Furthermore, the next figure illustrates the independent variable: respondent's perspectives on voter ID laws.
+This figure displays that nearly 1,500 respondents strongly support automatic registration, with over 2,000 supporting the policy to some degree. Indeed, only 750 respondents reported being against the policy.
+
+The next figure illustrates the independent variable: respondent's perspectives on voter ID laws.
 
 ```{r}
 voteridplot <- data |>
@@ -103,7 +108,10 @@ voteridplot <- data |>
        fill = "Degree of Support")
 voteridplot
 ```
+Similar to automatic registration, there appears to be more support for voter id laws than opposition. That said, there are fewer individuals — under 1500 — who support these laws strongly and nearly 500 respondents strongly oppose this policy.
 
+Results
+---
 
 ```{r}
 voterid_automaticreg_plot <- data |>
