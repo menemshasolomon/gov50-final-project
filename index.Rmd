@@ -179,7 +179,10 @@ In examining age and party more closely, the coefficient for age is found to be 
 
 Summary Graph 
 ---
+
 This final graph summarizes the relationship between party, the statistically significant explanatory variable with the largest coefficient, and views on automatic registration.
+
+
 ```{r}
 my_colors2 <- c("Democrat" = "cadetblue1",
                 "Republican" = "indianred1")
@@ -200,6 +203,24 @@ This graph indicates a clear relationship between party membership and support o
 
 Conclusion 
 ---
+
 The initial hypothesis stated that perspective on automatic registration will correlate with perspective on voter ID laws wherein individuals who oppose voter ID laws, a policy with a longstanding history of voter discrimination, will support automatic registration, a policy which would increase access to voting. Both the bootstrapped difference in means and the regression model indicate that those who support voter ID laws tend to oppose automatic registration. That said, while the null hypothesis of no effect was rejected, the effect was found to be quite small. The next part of the hypothesis stated that I expected this relationship to be in large part explained first by party membership, as democrats typically support progressive voting policies, and second by racial identity, as marginalized racial groups are historically the most affected by voter disenfranchisement. Surprisingly, the regrssion model found that the relationship between race and perspective on automatic registration was not statistically significant. Two other independent variables — age and party membership — were, however, statistically significant, and for both, the null hypothesis of no effect could be rejected. Indeed, an increase in age appeared to correlate with a small increase in opposition toward automatic registration. Furthermore, the coefficient for party membership was the largest, indicating that democrats tended to favor automatic registration by 1.419 points more than republican respondents. 
 
 These results beget the conclusion that passing automatic registration policy is not seen as the same as abolishing voter ID laws in the United States. Indeed, while those who support voter id laws correlate somewhat with those who support automatic registration, the explanatory variable with the largest impact on perspective is party membership. Despite this, there is not enough data in this study to determine any sort of causal relationship, merely assert that there is definitely correlation. To conduct a more comprehensive analysis of perspective on the various influences which determine an individual's perspective on voter registration, it is important to look at many policies across time. 
+
+Works Cited
+---
+
+Keeter, Scott. "Growing and Improving Pew Research Center's American Trends Panel." Pew Research 
+     Center. Last modified February 27, 2019. Accessed December 13, 2023. 
+     https://www.pewresearch.org/methods/2019/02/27/ 
+     growing-and-improving-pew-research-centers-american-trends-panel/. 
+ 
+Morris, Kevin, and Peter Dunphy. AVR Impact on State Voter Registration. April 11, 2019. Accessed 
+     December 13, 2023. https://www.brennancenter.org/our-work/research-reports/ 
+     avr-impact-state-voter-registration. 
+ 
+Republicans and Democrats Move Further Apart in Views of Voting Access. April 22, 2021. Accessed 
+     December 13, 2023. https://www.pewresearch.org/politics/2021/04/22/ 
+     republicans-and-democrats-move-further-apart-in-views-of-voting-access/. 
+ 
